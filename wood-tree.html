@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="style.css">
+<title>Raw Wood Calculator</title>
+<style>
+.saved{margin-top:14px}
+.saved-record{border:1px solid #e5d9cf;border-radius:12px;padding:12px;margin-top:10px;background:#fbf8f5}
+.saved-head{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.saved-date{font-size:12px;color:#806f62}
+.saved-wood{font-weight:900;font-size:16px}
+.saved-line{display:flex;justify-content:space-between;margin-top:6px;font-size:13px}
+.delete-record{background:#f1e7df;color:#6a321f;padding:7px 10px;font-size:12px}
+</style>
+</head>
+<body>
+<div class="app">
+<a class="back" href="index.html">← Home</a>
+
+<div class="page">
+  <h2>🌳 Raw Wood / Tree Calculator</h2>
+  <p class="muted">Length × Perimeter² ÷ 2304 = CuFt</p>
+</div>
+
+<div class="page">
+  <div id="logs"></div>
+  <button class="primary" id="add">＋ Add Raw Wood</button>
+</div>
+
+<div class="page">
+  <div class="result-line"><span>Total CuFt</span><b id="cuft">0.000</b></div>
+  <div class="result-line"><span>Total CuM</span><b id="cum">0.0000</b></div>
+  <div class="result-line total"><span>Total Quantity</span><b id="qty">0</b></div>
+  <button class="primary" id="save">💾 Save Record</button>
+  <button class="secondary" id="reset">New Calculation</button>
+</div>
+
+<div class="page saved">
+  <h2>📋 Saved Records</h2>
+  <p class="muted">Records are stored on this phone/browser and remain after closing the app.</p>
+  <div id="savedRecords"></div>
+</div>
+
+<script>
+const le=document.getElementById("logs");
+const savedEl=document.getElementById("savedRecords");
+let n=0;
+
+function add(name="",l="",p="",q=1){
+  n++;
+  let d=document.createElement("div");
+  d.className="item";
+  d.innerHTML=`
+    <label>Wood Name
+      <input class="wood" type="text" placeholder="e.g. Teak Wood" value="${name}">
+    </label>
+    <div class="row">
+      <label>Length (feet)
+        <input class="l" type="number" min="0" step=".01" value="${l}">
+      </label>
+      <label>Perimeter (inch)
+        <input class="p" type="number" min="0" step=".01" value="${p}">
+      </label>
+    </div>
+    <label>Quantity
+      <input class="q" type="number" min="1" step="1" value="${q}">
+    </label>
+    <div class="result">CuFt: <b class="r">0.000</b></div>
+    <button class="secondary rm">Remove</button>`;
+
+  le.appendChild(d);
+
+  d.querySelectorAll("input").forEach(x=>x.oninput=calc);
+  d.querySelector(".rm").onclick=()=>{
+    d.remove();
+    calc();
+  };
+  calc();
+}
+
+function calc(){
+  let s=0,q=0;
+  document.querySelectorAll("#logs .item").forEach(d=>{
+    let l=+d.querySelector(".l").value||0;
+    let p=+d.querySelector(".p").value||0;
+    let k=+d.querySelector(".q").value||0;
+    let x=l*p*p/2304*k;
+    s+=x;
+    q+=k;
+    d.querySelector(".r").textContent=x.toFixed(3);
+  });
+  document.getElementById("cuft").textContent=s.toFixed(3);
+  document.getElementById("cum").textContent=(s*.028316846592).toFixed(4);
+  document.getElementById("qty").textContent=q;
+}
+
+function getCurrentEntries(){
+  const entries=[];
+  document.querySelectorAll("#logs .item").forEach(d=>{
+    const wood=d.querySelector(".wood").value.trim();
+    const l=+d.querySelector(".l").value||0;
+    const p=+d.querySelector(".p").value||0;
+    const q=+d.querySelector(".q").value||0;
+    if(l>0 && p>0 && q>0){
+      const cuft=l*p*p/2304*q;
+      entries.push({wood,length:l,perimeter:p,quantity:q,cuft});
+    }
+  });
+  return entries;
+}
+
+function loadRecords(){
+  const records=JSON.parse(localStorage.getItem("agarwalWoodRecords")||"[]");
+  savedEl.innerHTML="";
+  if(!records.length){
+    savedEl.innerHTML='<div class="muted" style="padding:10px 0">No saved records yet.</div>';
+    return;
+  }
+
+  records.forEach((rec,index)=>{
+    const box=document.createElement("div");
+    box.className="saved-record";
+
+    let rows=rec.entries.map(e=>`
+      <div class="saved-line">
+        <span><b>${e.wood}</b> — ${e.quantity} nos</span>
+        <span>${e.cuft.toFixed(3)} CuFt</span>
+      </div>
+      <div class="saved-line" style="color:#806f62">
+        <span>${e.length} ft × ${e.perimeter} in</span>
+      </div>
+    `).join("");
+
+    box.innerHTML=`
+      <div class="saved-head">
+        <div>
+          <div class="saved-wood">Record ${records.length-index}</div>
+          <div class="saved-date">${rec.date}</div>
+        </div>
+        <button class="delete-record" data-index="${index}">Delete</button>
+      </div>
+      ${rows}
+      <div class="saved-line" style="border-top:1px solid #e5d9cf;padding-top:8px;margin-top:8px">
+        <b>Total</b><b>${rec.totalCuft.toFixed(3)} CuFt</b>
+      </div>`;
+
+    box.querySelector(".delete-record").onclick=()=>{
+      records.splice(index,1);
+      localStorage.setItem("agarwalWoodRecords",JSON.stringify(records));
+      loadRecords();
+    };
+
+    savedEl.appendChild(box);
+  });
+}
+
+document.getElementById("add").onclick=()=>add();
+document.getElementById("save").onclick=()=>{
+  const entries=getCurrentEntries();
+  if(!entries.length){
+    alert("Please enter at least one wood name and valid measurement.");
+    return;
+  }
+
+  const totalCuft=entries.reduce((sum,e)=>sum+e.cuft,0);
+  const records=JSON.parse(localStorage.getItem("agarwalWoodRecords")||"[]");
+
+  records.unshift({
+    date:new Date().toLocaleString("en-IN"),
+    entries,
+    totalCuft
+  });
+
+  localStorage.setItem("agarwalWoodRecords",JSON.stringify(records));
+  loadRecords();
+  alert("Record saved successfully.");
+};
+
+document.getElementById("reset").onclick=()=>{
+  le.innerHTML="";
+  n=0;
+  add();
+};
+
+add();
+loadRecords();
+</script>
+</body>
+</html>
