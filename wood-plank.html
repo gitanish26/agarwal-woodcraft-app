@@ -1,0 +1,12 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="style.css"><title>Wood Plank Calculator</title></head><body><div class="app">
+<a class="back" href="index.html">← Home</a><div class="page"><h2>📐 Wood Plank Calculator</h2><p class="muted">Length (feet) × Width (inches) ÷ 12 = Sq.ft</p>
+<label>Rate per sq.ft (₹)<input id="rate" type="number" value="100" min="0"></label></div>
+<div class="page"><div id="pieces"></div><button class="primary" id="add">＋ Add Wood Piece</button></div>
+<div class="page"><div class="result-line"><span>Total Sq.ft</span><b id="sqft">0.00</b></div><div class="result-line total"><span>Grand Total</span><b id="amount">₹0.00</b></div><button class="secondary" id="reset">Reset</button></div>
+</div><script>
+const pe=document.getElementById("pieces"),rate=document.getElementById("rate");let n=0;
+function add(l="",w=""){n++;let d=document.createElement("div");d.className="item";d.innerHTML=`<b>Piece ${n}</b><div class="row"><label>Length (feet)<input class="l" type="number" min="0" step=".01" value="${l}"></label><label>Width (inches)<input class="w" type="number" min="0" step=".01" value="${w}"></label></div><div class="result">Area: <b class="a">0.00</b> sq.ft &nbsp; Amount: <b class="m">₹0.00</b></div><button class="secondary rm">Remove</button>`;pe.appendChild(d);d.querySelectorAll("input").forEach(x=>x.oninput=calc);d.querySelector(".rm").onclick=()=>{d.remove();renumber();calc()};calc()}
+function renumber(){[...pe.children].forEach((x,i)=>x.querySelector("b").textContent="Piece "+(i+1))}
+function calc(){let s=0,a=0;document.querySelectorAll(".item").forEach(d=>{let l=+d.querySelector(".l").value||0,w=+d.querySelector(".w").value||0,x=l*w/12,y=x*(+rate.value||0);s+=x;a+=y;d.querySelector(".a").textContent=x.toFixed(2);d.querySelector(".m").textContent="₹"+y.toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2})});document.getElementById("sqft").textContent=s.toFixed(2);document.getElementById("amount").textContent="₹"+a.toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2})}
+document.getElementById("add").onclick=()=>add();rate.oninput=calc;document.getElementById("reset").onclick=()=>{pe.innerHTML="";n=0;add(5,20)};add(5,20);
+</script></body></html>

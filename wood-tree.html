@@ -1,0 +1,11 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="style.css"><title>Raw Wood Calculator</title></head><body><div class="app">
+<a class="back" href="index.html">← Home</a><div class="page"><h2>🌳 Raw Wood / Tree Calculator</h2><p class="muted">Length × Perimeter² ÷ 2304 = CuFt</p></div>
+<div class="page"><div id="logs"></div><button class="primary" id="add">＋ Add Raw Wood</button></div>
+<div class="page"><div class="result-line"><span>Total CuFt</span><b id="cuft">0.000</b></div><div class="result-line"><span>Total CuM</span><b id="cum">0.0000</b></div><div class="result-line total"><span>No. of Logs</span><b id="qty">0</b></div><button class="secondary" id="reset">New Calculation</button></div>
+</div><script>
+const le=document.getElementById("logs");let n=0;
+function add(l="",p="",q=1){n++;let d=document.createElement("div");d.className="item";d.innerHTML=`<b>Raw Wood ${n}</b><div class="row"><label>Length (feet)<input class="l" type="number" min="0" step=".01" value="${l}"></label><label>Perimeter (inch)<input class="p" type="number" min="0" step=".01" value="${p}"></label></div><label>Quantity<input class="q" type="number" min="1" step="1" value="${q}"></label><div class="result">CuFt: <b class="r">0.000</b></div><button class="secondary rm">Remove</button>`;le.appendChild(d);d.querySelectorAll("input").forEach(x=>x.oninput=calc);d.querySelector(".rm").onclick=()=>{d.remove();renumber();calc()};calc()}
+function renumber(){[...le.children].forEach((x,i)=>x.querySelector("b").textContent="Raw Wood "+(i+1))}
+function calc(){let s=0,q=0;document.querySelectorAll(".item").forEach(d=>{let l=+d.querySelector(".l").value||0,p=+d.querySelector(".p").value||0,k=+d.querySelector(".q").value||0,x=l*p*p/2304*k;s+=x;q+=k;d.querySelector(".r").textContent=x.toFixed(3)});document.getElementById("cuft").textContent=s.toFixed(3);document.getElementById("cum").textContent=(s*.028316846592).toFixed(4);document.getElementById("qty").textContent=q}
+document.getElementById("add").onclick=()=>add();document.getElementById("reset").onclick=()=>{le.innerHTML="";n=0;add()};add();
+</script></body></html>

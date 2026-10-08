@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#5b351d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Agarwal Woodcraft">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+<title>Agarwal Woodcraft</title>
+</head>
+<body>
+<div class="app">
+<header class="hero">
+  <div class="logo">🪵</div>
+  <h1>Agarwal Woodcraft Industries</h1>
+  <p>Wood • Furniture • Custom Work</p>
+  <small>MANNARGUDI</small>
+</header>
+
+<main class="grid">
+  <a class="menu-card" href="wood-plank.html"><span>📐</span><b>Wood Plank</b><small>Sq.ft & amount calculator</small></a>
+  <a class="menu-card" href="wood-tree.html"><span>🌳</span><b>Raw Wood / Tree</b><small>Round log CuFt calculator</small></a>
+  <a class="menu-card" href="prices.html"><span>💰</span><b>Wood Prices</b><small>View current rates</small></a>
+  <a class="menu-card" href="stock.html"><span>📦</span><b>Stock</b><small>View available stock</small></a>
+  <a class="menu-card" href="products.html"><span>🪑</span><b>Products</b><small>Furniture & wood products</small></a>
+</main>
+
+<a class="whatsapp" href="https://wa.me/919245141108">💬 WhatsApp Us</a>
+<footer>Created by <b>Anishkumar Agarwal</b></footer>
+</div>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("./service-worker.js"));
+}
+</script>
+</body>
+</html>
